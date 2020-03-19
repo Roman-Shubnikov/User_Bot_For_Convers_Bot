@@ -35,11 +35,14 @@ def get_peer_id(chat_id):
 
 
 def get_conv_msg_ids(chat_id, msg_ids):
-    return [
-        i['id'] for i in
-        vk.method('messages.getByConversationMessageId',
-                  {'peer_id': get_peer_id(chat_id), 'conversation_message_ids': msg_ids})
-    ]
+    ids = ""
+    quest = vk.method('messages.getByConversationMessageId',{'peer_id': get_peer_id(chat_id), 'conversation_message_ids': msg_ids})["items"]
+    for i in quest:
+        ids += str(i["id"]) + ","
+    return ids
+def write_msg(chat_id, mess):
+    vk.method('messages.send',
+              {'chat_id': chat_id, 'message': mess,'random_id': 0})
 
 
 @app.route('/', methods=['POST'])
@@ -51,35 +54,42 @@ def result():
         try:
             if task == 'conf':
                 return jsonify(response=1)
+            elif task == "write_msg":
+                write_msg(object['chat_id'], object['msg'])
+                return jsonify(response=1)
             elif task == 'invite_user':
                 invite_user(object['chat_id'], object['user'])
+                write_msg(object['chat_id'], "&#9989; Пользователь был добавлен юзерботом")
                 return jsonify(response=1)
 
             elif task == 'delete_msg':
                 delete_msg(object['chat_id'], object['msg_ids'])
+                write_msg(object['chat_id'],"&#9989; Сообщения удалены")
                 return jsonify(response=1)
 
             elif task == 'add_fr':
                 add_fr(object['user'])
+                write_msg(object['chat_id'],"&#9989; Заявка дружбы была отправлена")
                 return jsonify(response=1)
 
             elif task == 'del_fr':
                 del_fr(object['user'])
+                write_msg(object['chat_id'], "&#9989; Друг был удалён")
                 return jsonify(response=1)
             else:
                 return jsonify(response=3)
         except Exception as e:
             e = str(e)
             if e.startswith("[15]") == True:
-                return jsonify(response=4, err="пользователь не в друзьях")
+                return jsonify(response=4, err=e)
             elif e.startswith("[1]") == True or e.startswith("[10]") == True:
-                return jsonify(response=5, err="внутренняя ошибка вк, тут остаётся только ждать и верить в лучшее")
+                return jsonify(response=5, err=e)
             elif e.startswith("[5]") == True:
-                return jsonify(response=6, err="неверный токен")
+                return jsonify(response=6, err=e)
             elif e.startswith("[6]") == True:
-                return jsonify(response=7, err="У вас слишком перегружен сервер, не раздавайте свой сервер кому попало")
+                return jsonify(response=7, err=e)
             else:
-                return jsonify(response=0, err="неизвесная ошибка")
+                return jsonify(response=0, err=e)
     else:
         return jsonify(response=2)
 
