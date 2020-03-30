@@ -66,7 +66,9 @@ def result():
                 delete_msg(object['chat_id'], object['msg_ids'])
                 write_msg(object['chat_id'],"&#9989; Сообщения удалены")
                 return jsonify(response=1)
-
+            elif task == 'soft_delete':
+                delete_msg(object['chat_id'], object['msg_ids'])
+                return jsonify(response=1)
             elif task == 'add_fr':
                 add_fr(object['user'])
                 write_msg(object['chat_id'],"&#9989; Заявка дружбы была отправлена")
