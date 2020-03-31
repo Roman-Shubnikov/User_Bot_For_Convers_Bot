@@ -1,3 +1,8 @@
+'''
+Создано: Shubnikov Roman
+
+Версия: 1.3
+'''
 import json
 
 import vk_api
