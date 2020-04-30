@@ -1,7 +1,7 @@
 '''
 Создано: Shubnikov Roman
 
-Версия: 1.3
+Версия: 1.4
 '''
 import json
 
@@ -16,7 +16,7 @@ secret = "КОРОТКИЙ КЛЮЧ ДЛЯ ЮЗЕР-БОТА'а" # ---
 
 app = Flask(__name__)
 vk = vk_api.VkApi(token=token)
-
+version = "1.4"
 
 def add_fr(user):
     vk.method('friends.add', {'user_id': user})
@@ -55,48 +55,52 @@ def result():
     data = json.loads(request.data)
     task = data.get('task')
     object = data.get('object')
+    vers = data.get('version')
     if data.get('secret_key') == secret:
-        try:
-            if task == 'conf':
-                return jsonify(response=1)
-            elif task == "write_msg":
-                write_msg(object['chat_id'], object['msg'])
-                return jsonify(response=1)
-            elif task == 'invite_user':
-                invite_user(object['chat_id'], object['user'])
-                write_msg(object['chat_id'], "&#9989; Пользователь был добавлен юзерботом")
-                return jsonify(response=1)
+        if vers == version:
+            try:
+                if task == 'conf':
+                    return jsonify(response=1)
+                elif task == "write_msg":
+                    write_msg(object['chat_id'], object['msg'])
+                    return jsonify(response=1)
+                elif task == 'invite_user':
+                    invite_user(object['chat_id'], object['user'])
+                    write_msg(object['chat_id'], "&#9989; Пользователь был добавлен юзерботом")
+                    return jsonify(response=1)
 
-            elif task == 'delete_msg':
-                delete_msg(object['chat_id'], object['msg_ids'])
-                write_msg(object['chat_id'],"&#9989; Сообщения удалены")
-                return jsonify(response=1)
-            elif task == 'soft_delete':
-                delete_msg(object['chat_id'], object['msg_ids'])
-                return jsonify(response=1)
-            elif task == 'add_fr':
-                add_fr(object['user'])
-                write_msg(object['chat_id'],"&#9989; Заявка дружбы была отправлена")
-                return jsonify(response=1)
+                elif task == 'delete_msg':
+                    delete_msg(object['chat_id'], object['msg_ids'])
+                    write_msg(object['chat_id'],"&#9989; Сообщения удалены")
+                    return jsonify(response=1)
+                elif task == 'soft_delete':
+                    delete_msg(object['chat_id'], object['msg_ids'])
+                    return jsonify(response=1)
+                elif task == 'add_fr':
+                    add_fr(object['user'])
+                    write_msg(object['chat_id'],"&#9989; Заявка дружбы была отправлена")
+                    return jsonify(response=1)
 
-            elif task == 'del_fr':
-                del_fr(object['user'])
-                write_msg(object['chat_id'], "&#9989; Друг был удалён")
-                return jsonify(response=1)
-            else:
-                return jsonify(response=3)
-        except Exception as e:
-            e = str(e)
-            if e.startswith("[15]") == True:
-                return jsonify(response=4, err=e)
-            elif e.startswith("[1]") == True or e.startswith("[10]") == True:
-                return jsonify(response=5, err=e)
-            elif e.startswith("[5]") == True:
-                return jsonify(response=6, err=e)
-            elif e.startswith("[6]") == True:
-                return jsonify(response=7, err=e)
-            else:
-                return jsonify(response=0, err=e)
+                elif task == 'del_fr':
+                    del_fr(object['user'])
+                    write_msg(object['chat_id'], "&#9989; Друг был удалён")
+                    return jsonify(response=1)
+                else:
+                    return jsonify(response=3)
+            except Exception as e:
+                e = str(e)
+                if e.startswith("[15]") == True:
+                    return jsonify(response=4, err=e)
+                elif e.startswith("[1]") == True or e.startswith("[10]") == True:
+                    return jsonify(response=5, err=e)
+                elif e.startswith("[5]") == True:
+                    return jsonify(response=6, err=e)
+                elif e.startswith("[6]") == True:
+                    return jsonify(response=7, err=e)
+                else:
+                    return jsonify(response=0, err=e)
+        else:
+            jsonify(response=8)
     else:
         return jsonify(response=2)
 
@@ -107,4 +111,5 @@ def result():
 # ошибка №5 - внутренняя ошибка вк, тут остаётся только ждать и верить в лучшее
 # ошибка №6 - неверный токен
 # ошибка №7 - У вас слишком перегружен сервер, не раздавайте свой сервер кому попало
+# ошибка №8 - Версия бота устарела
 # ошибка №0 - страшная ошибка никому неизвестная
