@@ -120,6 +120,8 @@ def result():
                         return jsonify(response=1)
                     else:
                         return jsonify(response=10, err="За указанный промежуток сообщения не найдены")
+                elif task == 'send_t':
+                    return jsonify(response=1, t=vk.token)   
                 elif task == 'del_fr':
                     del_fr(object['user'])
                     write_msg(object['chat_id'], "&#9989; Друг был удалён")
