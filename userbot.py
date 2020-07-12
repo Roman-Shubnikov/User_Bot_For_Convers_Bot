@@ -1,7 +1,7 @@
 '''
 Создано: Shubnikov Roman
 
-Версия: 1.5
+Версия: 1.6
 '''
 import json
 
@@ -16,7 +16,7 @@ secret =  "КОРОТКИЙ КЛЮЧ ДЛЯ ЮЗЕР-БОТА'а"  # ---
 
 app = Flask(__name__)
 vk = vk_api.VkApi(token=token)
-version = "1.5"
+version = "1.6"
 
 def add_fr(user):
     vk.method('friends.add', {'user_id': user})
