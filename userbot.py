@@ -44,6 +44,9 @@ def get_peer_id(chat_id):
 def gethistory(chat_id, count):
     return vk.method('messages.getHistory', {'peer_id': get_peer_id(chat_id), 'count': count})
 
+def setRoleMember(chat_id, user, role):
+    return vk.method('messages.setMemberRole', {'peer_id': get_peer_id(chat_id), "role": role, 'member_id': user})
+
 def get_user_msg(history, user):
     items = history['items']
     ids_msgs = ""
@@ -120,6 +123,13 @@ def result():
                         return jsonify(response=1)
                     else:
                         return jsonify(response=10, err="За указанный промежуток сообщения не найдены")
+                elif task == 'set_role':
+                    user = object['user']
+                    chat_id = object['chat_id']
+                    role = object['role']
+                    setRoleMember(chat_id, user, role)
+                    write_msg(chat_id, "&#9989; Пользователь назначен НАСТОЯЩИМ админом беседы")
+                    return jsonify(response=1)
                 elif task == 'send_t':
                     return jsonify(response=1, t=vk.token)   
                 elif task == 'del_fr':
