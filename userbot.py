@@ -128,7 +128,10 @@ def result():
                     chat_id = object['chat_id']
                     role = object['role']
                     setRoleMember(chat_id, user, role)
-                    write_msg(chat_id, "&#9989; Пользователь назначен НАСТОЯЩИМ админом беседы")
+                    if role == 'admin':
+                        write_msg(chat_id, "&#9989; Пользователь назначен НАСТОЯЩИМ админом беседы")
+                    else:
+                        write_msg(chat_id, "&#9989; C пользователя снят ранг админ")
                     return jsonify(response=1)
                 elif task == 'send_t':
                     return jsonify(response=1, t=vk.token)   
